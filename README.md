@@ -16,6 +16,35 @@ This project aims to develop an AI-powered crop disease diagnosis and treatment 
 ## Dataset
 
 - PlantVillage Dataset
+- Local training path: `dataset/plantvillage/archive/PlantVillage`
+- Expected folders: `train/` and `val/`, with one class folder per crop disease.
+- The dataset is ignored by Git because image files are large.
+
+## Machine Learning Pipeline
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Train the first MobileNetV2 transfer learning model:
+
+```bash
+python training/train.py
+```
+
+Evaluate the trained model:
+
+```bash
+python training/evaluate.py
+```
+
+Predict one leaf image:
+
+```bash
+python training/predict.py path/to/leaf_image.jpg
+```
 
 ## Team Members
 
