@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Crop Disease Diagnosis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="panel">
+        <div class="panel-header">
+          <h1>Crop Disease Diagnosis</h1>
+          <p>Upload a crop leaf image to identify disease and view treatment guidance.</p>
+        </div>
+
+        <form id="prediction-form" class="upload-form">
+          <label for="model">Model</label>
+          <select id="model" name="model">
+            {% for model in models %}
+              <option value="{{ model }}" {% if model == default_model %}selected{% endif %}>{{ model }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="image">Leaf image</label>
+          <input id="image" name="image" type="file" accept=".jpg,.jpeg,.png" required>
+
+          <button type="submit">Predict Disease</button>
+        </form>
+      </section>
+
+      <section id="result" class="result-panel hidden" aria-live="polite">
+        <img id="preview" alt="Uploaded leaf preview">
+        <div class="result-content">
+          <p id="status" class="status"></p>
+          <h2 id="prediction"></h2>
+          <p id="confidence"></p>
+          <div id="top-predictions" class="top-list"></div>
+          <h3>Treatment Recommendation</h3>
+          <dl>
+            <dt>Organic</dt>
+            <dd id="organic"></dd>
+            <dt>Chemical</dt>
+            <dd id="chemical"></dd>
+            <dt>Prevention</dt>
+            <dd id="prevention"></dd>
+          </dl>
+        </div>
+      </section>
+    </main>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>

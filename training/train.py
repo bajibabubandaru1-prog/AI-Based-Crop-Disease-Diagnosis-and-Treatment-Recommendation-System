@@ -1,26 +1,58 @@
+import argparse
+
 import tensorflow as tf
 
 from config import (
     CLASS_NAMES_PATH,
+    DEFAULT_MODEL_NAME,
     EPOCHS,
     FINE_TUNE_EPOCHS,
     FINE_TUNE_LAST_LAYERS,
     MODEL_DIR,
-    MODEL_PATH,
+    SUPPORTED_MODEL_NAMES,
+    get_model_path,
 )
 from dataset_loader import load_datasets
-from model import build_mobilenetv2_model, unfreeze_for_fine_tuning
+from model import build_transfer_learning_model, unfreeze_for_fine_tuning
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Train a crop disease classifier.")
+    parser.add_argument(
+        "--model",
+        choices=SUPPORTED_MODEL_NAMES,
+        default=DEFAULT_MODEL_NAME,
+        help="Transfer learning architecture to train.",
+    )
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=EPOCHS,
+        help="Frozen feature-extraction training epochs.",
+    )
+    parser.add_argument(
+        "--fine-tune-epochs",
+        type=int,
+        default=FINE_TUNE_EPOCHS,
+        help="Fine-tuning epochs after unfreezing the final base-model layers.",
+    )
+    return parser.parse_args()
 
 
 def main():
+    args = parse_args()
+    model_path = get_model_path(args.model)
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
     train_ds, val_ds, class_names = load_datasets()
-    model = build_mobilenetv2_model(num_classes=len(class_names))
+    model = build_transfer_learning_model(
+        model_name=args.model,
+        num_classes=len(class_names),
+    )
 
     callbacks = [
         tf.keras.callbacks.ModelCheckpoint(
-            MODEL_PATH,
+            model_path,
             monitor="val_accuracy",
             save_best_only=True,
             mode="max",
@@ -39,33 +71,34 @@ def main():
     history = model.fit(
         train_ds,
         validation_data=val_ds,
-        epochs=EPOCHS,
+        epochs=args.epochs,
         callbacks=callbacks,
     )
 
-    if FINE_TUNE_EPOCHS > 0:
+    if args.fine_tune_epochs > 0:
         print(
             "Starting fine-tuning: "
-            f"unfreezing last {FINE_TUNE_LAST_LAYERS} MobileNetV2 layers"
+            f"unfreezing last {FINE_TUNE_LAST_LAYERS} {args.model} layers"
         )
         model = unfreeze_for_fine_tuning(
             model,
+            model_name=args.model,
             last_layers=FINE_TUNE_LAST_LAYERS,
         )
         fine_tune_history = model.fit(
             train_ds,
             validation_data=val_ds,
-            initial_epoch=EPOCHS,
-            epochs=EPOCHS + FINE_TUNE_EPOCHS,
+            initial_epoch=args.epochs,
+            epochs=args.epochs + args.fine_tune_epochs,
             callbacks=callbacks,
         )
         history.history["accuracy"].extend(fine_tune_history.history["accuracy"])
         history.history["val_accuracy"].extend(fine_tune_history.history["val_accuracy"])
 
-    model.save(MODEL_PATH)
+    model.save(model_path)
     CLASS_NAMES_PATH.write_text("\n".join(class_names), encoding="utf-8")
 
-    print(f"Saved model to: {MODEL_PATH}")
+    print(f"Saved model to: {model_path}")
     print(f"Saved class names to: {CLASS_NAMES_PATH}")
     print("Final training accuracy:", history.history["accuracy"][-1])
     print("Final validation accuracy:", history.history["val_accuracy"][-1])

@@ -1,20 +1,35 @@
+import argparse
+
 import numpy as np
 import tensorflow as tf
 from sklearn.metrics import classification_report, confusion_matrix
 
-from config import CLASS_NAMES_PATH, MODEL_PATH
+from config import CLASS_NAMES_PATH, DEFAULT_MODEL_NAME, SUPPORTED_MODEL_NAMES, get_model_path
 from dataset_loader import load_datasets
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Evaluate a trained crop disease model.")
+    parser.add_argument(
+        "--model",
+        choices=SUPPORTED_MODEL_NAMES,
+        default=DEFAULT_MODEL_NAME,
+        help="Trained architecture to evaluate.",
+    )
+    return parser.parse_args()
+
+
 def main():
-    if not MODEL_PATH.exists():
-        raise FileNotFoundError(f"Trained model not found: {MODEL_PATH}")
+    args = parse_args()
+    model_path = get_model_path(args.model)
+    if not model_path.exists():
+        raise FileNotFoundError(f"Trained model not found: {model_path}")
 
     _, val_ds, class_names = load_datasets()
     if CLASS_NAMES_PATH.exists():
         class_names = CLASS_NAMES_PATH.read_text(encoding="utf-8").splitlines()
 
-    model = tf.keras.models.load_model(MODEL_PATH)
+    model = tf.keras.models.load_model(model_path)
 
     y_true = []
     y_pred = []

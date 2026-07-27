@@ -39,10 +39,22 @@ The training script runs two phases:
 - Frozen MobileNetV2 feature extraction.
 - Fine-tuning with the last MobileNetV2 layers unfrozen at a lower learning rate.
 
+Train EfficientNetB0 for comparison:
+
+```bash
+python training/train.py --model efficientnetb0
+```
+
 Evaluate the trained model:
 
 ```bash
 python training/evaluate.py
+```
+
+Evaluate EfficientNetB0:
+
+```bash
+python training/evaluate.py --model efficientnetb0
 ```
 
 Predict one leaf image:
@@ -50,6 +62,14 @@ Predict one leaf image:
 ```bash
 python training/predict.py path/to/leaf_image.jpg
 ```
+
+Run the Flask app after a trained model exists in `models/`:
+
+```bash
+python backend/app.py
+```
+
+Open `http://127.0.0.1:5000`, upload a leaf image, and review the top predictions with treatment recommendations. Predictions below 60% confidence are shown as uncertain.
 
 ## Team Members
 
