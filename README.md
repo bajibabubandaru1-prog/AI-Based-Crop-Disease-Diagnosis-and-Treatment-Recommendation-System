@@ -34,6 +34,11 @@ Train the first MobileNetV2 transfer learning model:
 python training/train.py
 ```
 
+The training script runs two phases:
+
+- Frozen MobileNetV2 feature extraction.
+- Fine-tuning with the last MobileNetV2 layers unfrozen at a lower learning rate.
+
 Evaluate the trained model:
 
 ```bash
