@@ -4,7 +4,11 @@ from config import FINE_TUNE_LEARNING_RATE, IMAGE_SIZE, LEARNING_RATE
 from preprocess import build_augmentation_layer
 
 
-def build_transfer_learning_model(model_name: str, num_classes: int) -> tf.keras.Model:
+def build_transfer_learning_model(
+    model_name: str,
+    num_classes: int,
+    weights: str | None = "imagenet",
+) -> tf.keras.Model:
     inputs = tf.keras.Input(shape=(*IMAGE_SIZE, 3))
     x = build_augmentation_layer()(inputs)
 
@@ -13,7 +17,7 @@ def build_transfer_learning_model(model_name: str, num_classes: int) -> tf.keras
         base_model = tf.keras.applications.MobileNetV2(
             input_shape=(*IMAGE_SIZE, 3),
             include_top=False,
-            weights="imagenet",
+            weights=weights,
             name="mobilenetv2_base",
         )
     elif model_name == "efficientnetb0":
@@ -21,15 +25,15 @@ def build_transfer_learning_model(model_name: str, num_classes: int) -> tf.keras
         base_model = tf.keras.applications.EfficientNetB0(
             input_shape=(*IMAGE_SIZE, 3),
             include_top=False,
-            weights="imagenet",
+            weights=weights,
             name="efficientnetb0_base",
         )
     else:
         raise ValueError(f"Unsupported model: {model_name}")
 
-    base_model.trainable = False
+    base_model.trainable = weights is None
 
-    x = base_model(x, training=False)
+    x = base_model(x, training=weights is None)
     x = tf.keras.layers.GlobalAveragePooling2D()(x)
     x = tf.keras.layers.Dropout(0.3)(x)
     outputs = tf.keras.layers.Dense(num_classes, activation="softmax")(x)

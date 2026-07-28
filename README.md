@@ -45,6 +45,12 @@ Train EfficientNetB0 for comparison:
 python training/train.py --model efficientnetb0
 ```
 
+If pretrained EfficientNetB0 weights cannot be downloaded, train it from scratch:
+
+```bash
+python training/train.py --model efficientnetb0 --weights none --fine-tune-epochs 0
+```
+
 Evaluate the trained model:
 
 ```bash

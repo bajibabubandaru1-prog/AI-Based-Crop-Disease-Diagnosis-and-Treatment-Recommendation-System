@@ -36,6 +36,12 @@ def parse_args():
         default=FINE_TUNE_EPOCHS,
         help="Fine-tuning epochs after unfreezing the final base-model layers.",
     )
+    parser.add_argument(
+        "--weights",
+        choices=("imagenet", "none"),
+        default="imagenet",
+        help="Use pretrained ImageNet weights or train the base model from scratch.",
+    )
     return parser.parse_args()
 
 
@@ -45,10 +51,24 @@ def main():
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
     train_ds, val_ds, class_names = load_datasets()
-    model = build_transfer_learning_model(
-        model_name=args.model,
-        num_classes=len(class_names),
-    )
+    weights = None if args.weights == "none" else "imagenet"
+    try:
+        model = build_transfer_learning_model(
+            model_name=args.model,
+            num_classes=len(class_names),
+            weights=weights,
+        )
+    except Exception as exc:
+        if weights != "imagenet":
+            raise
+        print(f"Could not load pretrained ImageNet weights: {exc}")
+        print("Retrying with weights=None. This trains the base model from scratch.")
+        weights = None
+        model = build_transfer_learning_model(
+            model_name=args.model,
+            num_classes=len(class_names),
+            weights=weights,
+        )
 
     callbacks = [
         tf.keras.callbacks.ModelCheckpoint(
@@ -75,7 +95,7 @@ def main():
         callbacks=callbacks,
     )
 
-    if args.fine_tune_epochs > 0:
+    if args.fine_tune_epochs > 0 and weights == "imagenet":
         print(
             "Starting fine-tuning: "
             f"unfreezing last {FINE_TUNE_LAST_LAYERS} {args.model} layers"
@@ -94,6 +114,8 @@ def main():
         )
         history.history["accuracy"].extend(fine_tune_history.history["accuracy"])
         history.history["val_accuracy"].extend(fine_tune_history.history["val_accuracy"])
+    elif args.fine_tune_epochs > 0:
+        print("Skipping fine-tuning phase because the model is training from scratch.")
 
     model.save(model_path)
     CLASS_NAMES_PATH.write_text("\n".join(class_names), encoding="utf-8")
