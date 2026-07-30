@@ -17,7 +17,7 @@ def validate_dataset_path(path: Path) -> None:
         raise ValueError(f"No class folders found inside: {path}")
 
 
-def load_datasets():
+def load_datasets(batch_size: int = BATCH_SIZE, prefetch_buffer_size=None):
     validate_dataset_path(TRAIN_DIR)
     validate_dataset_path(VAL_DIR)
 
@@ -26,7 +26,7 @@ def load_datasets():
         labels="inferred",
         label_mode="categorical",
         image_size=IMAGE_SIZE,
-        batch_size=BATCH_SIZE,
+        batch_size=batch_size,
         shuffle=True,
         seed=SEED,
     )
@@ -36,12 +36,12 @@ def load_datasets():
         labels="inferred",
         label_mode="categorical",
         image_size=IMAGE_SIZE,
-        batch_size=BATCH_SIZE,
+        batch_size=batch_size,
         shuffle=False,
     )
 
     class_names = train_ds.class_names
-    autotune = tf.data.AUTOTUNE
+    autotune = tf.data.AUTOTUNE if prefetch_buffer_size is None else prefetch_buffer_size
 
     train_ds = train_ds.prefetch(buffer_size=autotune)
     val_ds = val_ds.prefetch(buffer_size=autotune)

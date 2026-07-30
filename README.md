@@ -45,6 +45,44 @@ Train EfficientNetB0 for comparison:
 python training/train.py --model efficientnetb0
 ```
 
+Resume EfficientNetB0 training from the latest completed epoch:
+
+```bash
+python training/train.py --model efficientnetb0 --resume
+```
+
+The resume checkpoint is saved after each epoch in `models/training_checkpoints/`.
+If training stops in the middle of an epoch, rerunning with `--resume` continues from
+the last fully completed epoch.
+Progress details are written to
+`models/training_checkpoints/efficientnetb0_resume_state.json`, and epoch metrics are
+logged to `models/training_checkpoints/efficientnetb0_training_log.csv`.
+
+Continue training from an already saved EfficientNetB0 model when no resume checkpoint
+exists:
+
+```bash
+python training/train.py --model efficientnetb0 --continue-from-saved-model
+```
+
+If you know the saved model had already completed some epochs, pass that number:
+
+```bash
+python training/train.py --model efficientnetb0 --continue-from-saved-model --initial-epoch 5
+```
+
+Run more gently on a laptop while doing other work:
+
+```bash
+python training/train.py --model efficientnetb0 --resume --laptop-mode
+```
+
+Or control it manually:
+
+```bash
+python training/train.py --model efficientnetb0 --resume --batch-size 8 --cpu-threads 2
+```
+
 If pretrained EfficientNetB0 weights cannot be downloaded, train it from scratch:
 
 ```bash
