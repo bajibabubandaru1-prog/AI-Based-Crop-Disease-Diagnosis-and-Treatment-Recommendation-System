@@ -107,13 +107,55 @@ Predict one leaf image:
 python training/predict.py path/to/leaf_image.jpg
 ```
 
-Run the Flask app after a trained model exists in `models/`:
+## Web Application
 
-```bash
-python backend/app.py
+The Flask app provides a responsive upload interface for crop-leaf diagnosis. It shows
+the most likely condition, top three matching classes, a confidence warning, and
+organic, chemical, and preventive guidance.
+
+It supports three image sources:
+
+- Upload a JPG or PNG from the device.
+- Paste a direct, public JPG or PNG image URL from the web.
+- Use the mobile camera scanner to capture a leaf inside a scanning frame.
+
+Camera capture requires HTTPS on most mobile browsers. Standard image upload works when
+the phone opens the app through the same Wi-Fi or mobile hotspot network.
+
+### Before running
+
+At least one trained model must be present in `models/`:
+
+- `crop_disease_mobilenetv2.keras` for MobileNetV2
+- `crop_disease_efficientnetb0.keras` for EfficientNetB0
+
+`models/class_names.txt` must also be present. The model files are intentionally
+ignored by Git because they are large.
+
+### Run locally
+
+Activate the same virtual environment used for training, then run:
+
+```powershell
+cd "D:\ml projects\AI-based-crop-detection\AI-Based-Crop-Disease-Diagnosis-and-Treatment-Recommendation-System"
+python backend\app.py
 ```
 
-Open `http://127.0.0.1:5000`, upload a leaf image, and review the top predictions with treatment recommendations. Predictions below 60% confidence are shown as uncertain.
+Open [http://127.0.0.1:5000](http://127.0.0.1:5000) in a browser. Upload a clear,
+well-lit JPG or PNG leaf image no larger than 10 MB. The first prediction can be
+slower because TensorFlow loads the selected model into memory.
+
+### App API
+
+- `GET /api/health` reports class count and which trained models are available.
+- `GET /api/classes` returns the supported PlantVillage classes.
+- `POST /api/predict` accepts multipart form data with `image` and optional `model`
+  (`mobilenetv2` or `efficientnetb0`). It returns the top three predictions and guidance.
+- `POST /api/predict-url` accepts a public direct image URL in `image_url` and an
+  optional model. The server downloads and validates the image before predicting.
+
+Predictions below 60% confidence are treated as uncertain. They should be confirmed
+with clearer imagery or an agricultural professional, especially before any treatment.
 
 ## Team Members
 

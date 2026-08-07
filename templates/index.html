@@ -3,51 +3,88 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Crop Disease Diagnosis</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="theme-color" content="#176b4d">
+    <title>LeafLens | Crop Disease Diagnosis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v=asset_version) }}">
   </head>
   <body>
-    <main class="app-shell">
-      <section class="panel">
-        <div class="panel-header">
-          <h1>Crop Disease Diagnosis</h1>
-          <p>Upload a crop leaf image to identify disease and view treatment guidance.</p>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="LeafLens home"><span class="brand-mark" aria-hidden="true">LL</span><span>LeafLens</span></a>
+      <span class="header-note">Plant health decision support</span>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div class="intro">
+          <p class="eyebrow">Crop health scanner</p>
+          <h1 id="page-title">See what your crop leaf is trying to tell you.</h1>
+          <p class="intro-copy">Check a leaf from your gallery, camera, or a public web image link. Get a likely condition and practical next actions in seconds.</p>
+          <div class="hero-points"><span>38 plant conditions</span><span>Top 3 matches</span><span>Care guidance</span></div>
         </div>
-
-        <form id="prediction-form" class="upload-form">
-          <label for="model">Model</label>
-          <select id="model" name="model">
-            {% for model in models %}
-              <option value="{{ model }}" {% if model == default_model %}selected{% endif %}>{{ model }}</option>
-            {% endfor %}
-          </select>
-
-          <label for="image">Leaf image</label>
-          <input id="image" name="image" type="file" accept=".jpg,.jpeg,.png" required>
-
-          <button type="submit">Predict Disease</button>
-        </form>
+        <div class="hero-media"><img src="{{ url_for('showcase_leaf') }}" alt="Tomato leaf with late blight symptoms"><div class="image-tag">Field image ready</div></div>
       </section>
 
-      <section id="result" class="result-panel hidden" aria-live="polite">
-        <img id="preview" alt="Uploaded leaf preview">
-        <div class="result-content">
-          <p id="status" class="status"></p>
-          <h2 id="prediction"></h2>
-          <p id="confidence"></p>
-          <div id="top-predictions" class="top-list"></div>
-          <h3>Treatment Recommendation</h3>
-          <dl>
-            <dt>Organic</dt>
-            <dd id="organic"></dd>
-            <dt>Chemical</dt>
-            <dd id="chemical"></dd>
-            <dt>Prevention</dt>
-            <dd id="prevention"></dd>
-          </dl>
-        </div>
+      <section class="workspace" aria-label="Disease diagnosis tool">
+        <form id="prediction-form" class="diagnosis-form" novalidate>
+          <div class="form-heading">
+            <div><p class="step-label">01 / Source</p><h2>Choose how to scan</h2></div>
+            <span class="file-rule">Image up to 10 MB</span>
+          </div>
+
+          <div class="source-tabs" role="tablist" aria-label="Image source">
+            <button class="source-tab active" type="button" data-mode="upload" role="tab" aria-selected="true">Upload</button>
+            <button class="source-tab" type="button" data-mode="link" role="tab" aria-selected="false">Web link</button>
+            <button class="source-tab" type="button" data-mode="scan" role="tab" aria-selected="false">Scan</button>
+          </div>
+
+          <section class="source-panel" data-panel="upload">
+            <input id="image" name="image" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" hidden>
+            <label for="image" id="dropzone" class="dropzone"><span class="upload-symbol" aria-hidden="true">+</span><span class="dropzone-title">Drop your leaf image here</span><span class="dropzone-copy">or browse from your device</span></label>
+            <div id="selected-file" class="selected-file" hidden><span id="selected-file-name"></span><button id="clear-image" class="icon-button" type="button" aria-label="Remove selected image" title="Remove image">x</button></div>
+          </section>
+
+          <section class="source-panel" data-panel="link" hidden>
+            <label class="field-label" for="image-url">Direct image link</label>
+            <input id="image-url" name="image_url" type="url" placeholder="https://example.com/leaf-photo.jpg" inputmode="url">
+            <p class="input-hint">Paste a public link directly to a JPG or PNG image, not a web page or search-results link.</p>
+          </section>
+
+          <section class="source-panel scan-panel" data-panel="scan" hidden>
+            <div id="camera-stage" class="camera-stage">
+              <video id="camera-preview" playsinline autoplay muted aria-label="Camera preview"></video>
+              <div class="scan-frame" aria-hidden="true"><span></span></div>
+              <p id="camera-placeholder">Open the camera, then place one leaf inside the frame.</p>
+            </div>
+            <div class="camera-actions"><button id="open-camera" class="secondary-button" type="button">Open camera</button><button id="capture-image" class="secondary-button" type="button" disabled>Capture scan</button></div>
+            <p class="input-hint">Camera access needs a secure HTTPS link on most phones. Upload still works through a local network address.</p>
+            <canvas id="camera-canvas" hidden></canvas>
+          </section>
+
+          <div class="model-row">
+            <div><p class="step-label">02 / Model</p><label class="field-label" for="model">Prediction model</label><select id="model" name="model">{% for model in models %}<option value="{{ model.id }}" {% if model.id == default_model %}selected{% endif %} {% if not model.available %}disabled{% endif %}>{{ model.label }}{% if not model.available %} (not trained yet){% endif %}</option>{% endfor %}</select></div>
+            <p class="model-note">The first prediction can take a moment while the model loads.</p>
+          </div>
+
+          <button id="predict-button" class="predict-button" type="submit"><span>Analyze leaf</span><span aria-hidden="true">&rarr;</span></button>
+          <p id="form-message" class="form-message" role="alert" aria-live="polite"></p>
+        </form>
+
+        <section id="result" class="result-panel" aria-live="polite" aria-label="Prediction result">
+          <div class="result-empty" id="result-empty"><p class="step-label">03 / Result</p><h2>Your diagnosis will appear here.</h2><p>Use a close, well-lit photo of one leaf for the clearest result.</p></div>
+          <div id="result-content" class="result-content" hidden>
+            <div class="result-heading"><p class="step-label">03 / Result</p><span id="confidence-badge" class="confidence-badge"></span></div>
+            <div class="result-overview"><img id="preview" alt="Crop leaf submitted for diagnosis"><div><p class="result-label">Most likely condition</p><h2 id="prediction"></h2><p id="model-used" class="model-used"></p></div></div>
+            <p id="status" class="status"></p>
+            <div class="top-predictions-section"><h3 id="top-predictions-heading">Alternative matches</h3><div id="top-predictions" class="top-list"></div></div>
+            <div class="guidance"><div class="guidance-heading"><p class="step-label">Guidance</p><h3>Suggested next actions</h3></div><div class="guidance-grid"><article><h4>Organic care</h4><p id="organic"></p></article><article><h4>Chemical control</h4><p id="chemical"></p></article><article><h4>Prevention</h4><p id="prevention"></p></article></div><p class="disclaimer">Use this result as decision support. Confirm severe or uncertain symptoms with a qualified agricultural professional and follow local product labels.</p></div>
+          </div>
+        </section>
       </section>
     </main>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <footer>LeafLens uses image classification to support early crop health checks.</footer>
+    <script src="{{ url_for('static', filename='script.js', v=asset_version) }}"></script>
   </body>
 </html>
