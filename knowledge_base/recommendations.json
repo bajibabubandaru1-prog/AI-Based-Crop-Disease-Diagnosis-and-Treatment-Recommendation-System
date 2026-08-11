@@ -1,0 +1,56 @@
+{
+  "Apple___Apple_scab": {
+    "display_name": "Apple - Apple scab",
+    "organic_treatment": "Remove infected leaves and use sulfur-based organic fungicide where suitable.",
+    "chemical_treatment": "Use a registered apple scab fungicide only according to label instructions.",
+    "prevention": "Improve airflow, prune crowded branches, and clear fallen leaves."
+  },
+  "Corn_(maize)___Common_rust_": {
+    "display_name": "Corn - Common rust",
+    "organic_treatment": "Remove heavily infected leaves when practical and improve field airflow.",
+    "chemical_treatment": "Use a registered fungicide if rust pressure is high and crop stage justifies treatment.",
+    "prevention": "Use resistant varieties and avoid overhead irrigation where possible."
+  },
+  "Grape___Black_rot": {
+    "display_name": "Grape - Black rot",
+    "organic_treatment": "Remove infected leaves and mummified fruit; apply approved organic fungicide early.",
+    "chemical_treatment": "Use registered grape fungicides as part of a spray schedule.",
+    "prevention": "Prune vines for airflow and remove infected plant debris."
+  },
+  "Pepper,_bell___Bacterial_spot": {
+    "display_name": "Bell pepper - Bacterial spot",
+    "organic_treatment": "Remove infected leaves and avoid overhead watering.",
+    "chemical_treatment": "Copper-based sprays may help reduce spread when applied correctly.",
+    "prevention": "Use disease-free seed, rotate crops, and avoid working plants while wet."
+  },
+  "Potato___Early_blight": {
+    "display_name": "Potato - Early blight",
+    "organic_treatment": "Remove infected lower leaves and improve plant spacing.",
+    "chemical_treatment": "Use a registered fungicide if infection is spreading.",
+    "prevention": "Rotate crops, avoid plant stress, and remove infected debris after harvest."
+  },
+  "Potato___Late_blight": {
+    "display_name": "Potato - Late blight",
+    "organic_treatment": "Remove infected plants quickly and avoid wet leaf conditions.",
+    "chemical_treatment": "Use registered late blight fungicide immediately when disease risk is high.",
+    "prevention": "Use certified seed potatoes, monitor in cool wet weather, and destroy volunteer plants."
+  },
+  "Tomato___Late_blight": {
+    "display_name": "Tomato - Late blight",
+    "organic_treatment": "Remove infected leaves or plants and avoid overhead watering.",
+    "chemical_treatment": "Use registered fungicide as early as possible during high-risk weather.",
+    "prevention": "Improve airflow, avoid wet foliage, and remove infected crop debris."
+  },
+  "Tomato___healthy": {
+    "display_name": "Tomato - Healthy",
+    "organic_treatment": "No disease treatment required.",
+    "chemical_treatment": "No chemical treatment required.",
+    "prevention": "Continue regular monitoring, balanced watering, and good plant spacing."
+  },
+  "default": {
+    "display_name": "Crop disease prediction",
+    "organic_treatment": "Use the prediction as decision support and confirm with an agricultural expert.",
+    "chemical_treatment": "Apply chemical treatment only after expert confirmation and label guidance.",
+    "prevention": "Upload a clear close-up leaf image and monitor plants regularly."
+  }
+}

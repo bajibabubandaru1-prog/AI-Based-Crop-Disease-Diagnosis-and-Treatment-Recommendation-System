@@ -1,0 +1,56 @@
+﻿Found 43444 files belonging to 38 classes.
+Found 10861 files belonging to 38 classes.
+Classification Report
+                                                    precision    recall  f1-score   support
+
+                                Apple___Apple_scab       0.97      0.95      0.96       126
+                                 Apple___Black_rot       1.00      0.99      1.00       125
+                          Apple___Cedar_apple_rust       0.98      1.00      0.99        55
+                                   Apple___healthy       0.97      0.98      0.98       329
+                               Blueberry___healthy       1.00      0.99      0.99       300
+          Cherry_(including_sour)___Powdery_mildew       1.00      0.99      1.00       210
+                 Cherry_(including_sour)___healthy       1.00      0.99      0.99       170
+Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot       0.87      0.80      0.83       103
+                       Corn_(maize)___Common_rust_       1.00      0.99      0.99       239
+               Corn_(maize)___Northern_Leaf_Blight       0.89      0.94      0.92       197
+                            Corn_(maize)___healthy       1.00      1.00      1.00       233
+                                 Grape___Black_rot       0.97      0.98      0.98       236
+                      Grape___Esca_(Black_Measles)       0.98      0.98      0.98       276
+        Grape___Leaf_blight_(Isariopsis_Leaf_Spot)       1.00      1.00      1.00       215
+                                   Grape___healthy       1.00      0.99      0.99        84
+          Orange___Haunglongbing_(Citrus_greening)       1.00      1.00      1.00      1102
+                            Peach___Bacterial_spot       0.97      1.00      0.98       459
+                                   Peach___healthy       0.99      0.96      0.97        72
+                     Pepper,_bell___Bacterial_spot       0.95      1.00      0.98       200
+                            Pepper,_bell___healthy       1.00      0.97      0.99       295
+                             Potato___Early_blight       0.98      0.98      0.98       200
+                              Potato___Late_blight       0.97      0.96      0.97       200
+                                  Potato___healthy       0.96      0.77      0.86        31
+                               Raspberry___healthy       1.00      0.99      0.99        74
+                                 Soybean___healthy       0.99      1.00      0.99      1018
+                           Squash___Powdery_mildew       1.00      0.99      1.00       367
+                          Strawberry___Leaf_scorch       1.00      0.99      0.99       222
+                              Strawberry___healthy       1.00      1.00      1.00        92
+                           Tomato___Bacterial_spot       0.92      0.97      0.95       425
+                             Tomato___Early_blight       0.82      0.78      0.80       200
+                              Tomato___Late_blight       0.94      0.94      0.94       382
+                                Tomato___Leaf_Mold       0.96      0.92      0.94       191
+                       Tomato___Septoria_leaf_spot       0.94      0.85      0.89       354
+     Tomato___Spider_mites Two-spotted_spider_mite       0.93      0.89      0.91       335
+                              Tomato___Target_Spot       0.82      0.91      0.87       281
+            Tomato___Tomato_Yellow_Leaf_Curl_Virus       0.99      0.98      0.99      1071
+                      Tomato___Tomato_mosaic_virus       0.99      0.89      0.94        74
+                                  Tomato___healthy       0.95      1.00      0.98       318
+
+                                          accuracy                           0.97     10861
+                                         macro avg       0.97      0.96      0.96     10861
+                                      weighted avg       0.97      0.97      0.97     10861
+
+Confusion Matrix
+[[ 120    0    1 ...    0    0    0]
+ [   0  124    0 ...    0    0    0]
+ [   0    0   55 ...    0    0    0]
+ ...
+ [   0    0    0 ... 1054    0    0]
+ [   0    0    0 ...    2   66    0]
+ [   0    0    0 ...    0    0  318]]

@@ -20,9 +20,17 @@ dataset/*
 # Trained Models
 models/saved_models/
 models/checkpoints/
+models/*.keras
+models/invalid_*.keras
+models/invalid_*.txt
+models/training_checkpoints/
 
 # Uploaded Images
 frontend/uploads/
+static/uploads/
+
+# Evaluation warning logs
+evaluation-warnings*.txt
 
 # VS Code
 .vscode/
