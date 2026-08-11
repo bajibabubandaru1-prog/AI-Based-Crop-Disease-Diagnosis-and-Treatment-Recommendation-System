@@ -134,10 +134,33 @@ ignored by Git because they are large.
 
 ### Run locally
 
-Activate the same virtual environment used for training, then run:
+Use Python 3.12. Create a fresh virtual environment on every computer; do not copy a
+`.venv` folder from another machine.
 
 ```powershell
-cd "D:\ml projects\AI-based-crop-detection\AI-Based-Crop-Disease-Diagnosis-and-Treatment-Recommendation-System"
+git clone -b main https://github.com/bajibabubandaru1-prog/AI-Based-Crop-Disease-Diagnosis-and-Treatment-Recommendation-System.git
+cd AI-Based-Crop-Disease-Diagnosis-and-Treatment-Recommendation-System
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+Copy the trained models from the original computer into the cloned project's `models/`
+folder. At minimum, copy `crop_disease_mobilenetv2.keras`. Copying
+`crop_disease_efficientnetb0.keras` enables comparison, and `class_names.txt` must be
+present with the models. Model files are intentionally excluded from Git because they
+are large.
+
+Check the installation before starting the app:
+
+```powershell
+python scripts\verify_setup.py
+```
+
+When the check reports only `OK`, start the app:
+
+```powershell
 python backend\app.py
 ```
 
