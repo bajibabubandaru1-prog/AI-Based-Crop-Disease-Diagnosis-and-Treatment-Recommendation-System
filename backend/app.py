@@ -97,7 +97,7 @@ def create_app(config_class=Config):
         return parsed.geturl()
 
     def download_remote_image(image_url: str, destination: Path) -> None:
-        request_headers = {"User-Agent": "LeafLens/1.0 image diagnosis"}
+        request_headers = {"User-Agent": "leaflens.ai/1.0 image diagnosis"}
         try:
             with urlopen(
                 Request(image_url, headers=request_headers),

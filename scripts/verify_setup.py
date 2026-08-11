@@ -1,4 +1,4 @@
-"""Check whether this computer is ready to run the LeafLens web application."""
+"""Check whether this computer is ready to run the leaflens.ai web application."""
 
 from __future__ import annotations
 
