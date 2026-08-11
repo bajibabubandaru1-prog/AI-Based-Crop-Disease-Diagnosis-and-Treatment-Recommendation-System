@@ -16,6 +16,7 @@ try:
     from .config import Config
     from .model_service import (
         DEFAULT_MODEL_NAME,
+        get_best_available_model_name,
         get_available_models,
         load_class_names,
         predict_leaf_image,
@@ -23,7 +24,13 @@ try:
     from .recommendations import get_recommendation
 except ImportError:  # Allows: python backend/app.py
     from config import Config
-    from model_service import DEFAULT_MODEL_NAME, get_available_models, load_class_names, predict_leaf_image
+    from model_service import (
+        DEFAULT_MODEL_NAME,
+        get_best_available_model_name,
+        get_available_models,
+        load_class_names,
+        predict_leaf_image,
+    )
     from recommendations import get_recommendation
 
 
@@ -45,14 +52,8 @@ def create_app(config_class=Config):
         response.headers["Expires"] = "0"
         return response
 
-    def get_available_model_ids():
-        return {model["id"] for model in get_available_models() if model["available"]}
-
     def get_requested_model():
-        model_name = request.form.get("model", DEFAULT_MODEL_NAME)
-        if model_name not in get_available_model_ids():
-            raise ValueError("The selected model is not available. Choose a trained model.")
-        return model_name
+        return get_best_available_model_name()
 
     def build_prediction_response(image_path: Path, saved_name: str, model_name: str):
         result = predict_leaf_image(
@@ -224,4 +225,4 @@ app = create_app()
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

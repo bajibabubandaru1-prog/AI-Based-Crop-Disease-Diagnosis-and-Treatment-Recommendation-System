@@ -37,12 +37,14 @@
           <div class="source-tabs" role="tablist" aria-label="Image source">
             <button class="source-tab active" type="button" data-mode="upload" role="tab" aria-selected="true">Upload</button>
             <button class="source-tab" type="button" data-mode="link" role="tab" aria-selected="false">Web link</button>
-            <button class="source-tab" type="button" data-mode="scan" role="tab" aria-selected="false">Scan</button>
+            <button id="scan-tab" class="source-tab" type="button" data-mode="scan" role="tab" aria-selected="false">Scan</button>
           </div>
 
           <section class="source-panel" data-panel="upload">
             <input id="image" name="image" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" hidden>
+            <input id="phone-camera-image" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" capture="environment" hidden>
             <label for="image" id="dropzone" class="dropzone"><span class="upload-symbol" aria-hidden="true">+</span><span class="dropzone-title">Drop your leaf image here</span><span class="dropzone-copy">or browse from your device</span></label>
+            <label for="phone-camera-image" class="phone-camera-button">Take a photo</label>
             <div id="selected-file" class="selected-file" hidden><span id="selected-file-name"></span><button id="clear-image" class="icon-button" type="button" aria-label="Remove selected image" title="Remove image">x</button></div>
           </section>
 
@@ -52,7 +54,7 @@
             <p class="input-hint">Paste a public link directly to a JPG or PNG image, not a web page or search-results link.</p>
           </section>
 
-          <section class="source-panel scan-panel" data-panel="scan" hidden>
+          <section id="scan-panel" class="source-panel scan-panel" data-panel="scan" hidden>
             <div id="camera-stage" class="camera-stage">
               <video id="camera-preview" playsinline autoplay muted aria-label="Camera preview"></video>
               <div class="scan-frame" aria-hidden="true"><span></span></div>
@@ -64,8 +66,8 @@
           </section>
 
           <div class="model-row">
-            <div><p class="step-label">02 / Model</p><label class="field-label" for="model">Prediction model</label><select id="model" name="model">{% for model in models %}<option value="{{ model.id }}" {% if model.id == default_model %}selected{% endif %} {% if not model.available %}disabled{% endif %}>{{ model.label }}{% if not model.available %} (not trained yet){% endif %}</option>{% endfor %}</select></div>
-            <p class="model-note">The first prediction can take a moment while the model loads.</p>
+            <div><p class="step-label">02 / Model</p><p class="field-label">Automatic model selection</p><p class="auto-model">The best trained model will be selected automatically.</p></div>
+            <p class="model-note">The system selects the strongest available trained model automatically. The first prediction can take a moment while it loads.</p>
           </div>
 
           <button id="predict-button" class="predict-button" type="submit"><span>Analyze leaf</span><span aria-hidden="true">&rarr;</span></button>

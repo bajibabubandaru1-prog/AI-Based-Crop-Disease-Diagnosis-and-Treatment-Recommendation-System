@@ -1,9 +1,12 @@
 const form = document.querySelector("#prediction-form");
 const imageInput = document.querySelector("#image");
+const phoneCameraInput = document.querySelector("#phone-camera-image");
 const imageUrlInput = document.querySelector("#image-url");
 const dropzone = document.querySelector("#dropzone");
 const sourceTabs = document.querySelectorAll(".source-tab");
 const sourcePanels = document.querySelectorAll(".source-panel");
+const scanTab = document.querySelector("#scan-tab");
+const scanPanel = document.querySelector("#scan-panel");
 const selectedFile = document.querySelector("#selected-file");
 const selectedFileName = document.querySelector("#selected-file-name");
 const clearImage = document.querySelector("#clear-image");
@@ -29,6 +32,13 @@ const captureButton = document.querySelector("#capture-image");
 
 let activeMode = "upload";
 let cameraStream = null;
+let selectedImageFile = null;
+const liveCameraAvailable = window.isSecureContext && Boolean(navigator.mediaDevices?.getUserMedia);
+
+if (!liveCameraAvailable) {
+  scanTab.hidden = true;
+  scanPanel.hidden = true;
+}
 
 function formatPercent(value) { return `${(value * 100).toFixed(1)}%`; }
 function setMessage(message = "") { formMessage.textContent = message; }
@@ -42,6 +52,7 @@ function stopCamera() {
 }
 
 function setSelectedFile(file) {
+  selectedImageFile = file || null;
   if (!file) {
     selectedFile.hidden = true;
     selectedFileName.textContent = "";
@@ -54,7 +65,7 @@ function setSelectedFile(file) {
   setMessage("");
 }
 
-function resetSelectedFile() { imageInput.value = ""; setSelectedFile(null); }
+function resetSelectedFile() { imageInput.value = ""; phoneCameraInput.value = ""; setSelectedFile(null); }
 
 function setMode(mode) {
   activeMode = mode;
@@ -69,8 +80,8 @@ function setMode(mode) {
 }
 
 async function openCamera() {
-  if (!navigator.mediaDevices?.getUserMedia) {
-    setMessage("Camera scanning needs HTTPS on mobile. Use upload for this local test, then use an HTTPS deployment for scanning.");
+  if (!liveCameraAvailable) {
+    setMessage("Live camera scanning is available after HTTPS deployment. Use Take a photo or upload for this local test.");
     return;
   }
   try {
@@ -92,9 +103,6 @@ function captureCameraImage() {
   cameraCanvas.toBlob((blob) => {
     if (!blob) return;
     const file = new File([blob], `leaf-scan-${Date.now()}.jpg`, { type: "image/jpeg" });
-    const transfer = new DataTransfer();
-    transfer.items.add(file);
-    imageInput.files = transfer.files;
     setSelectedFile(file);
     stopCamera();
     setMode("upload");
@@ -103,6 +111,7 @@ function captureCameraImage() {
 }
 
 imageInput.addEventListener("change", () => setSelectedFile(imageInput.files[0]));
+phoneCameraInput.addEventListener("change", () => setSelectedFile(phoneCameraInput.files[0]));
 clearImage.addEventListener("click", resetSelectedFile);
 sourceTabs.forEach((tab) => tab.addEventListener("click", () => setMode(tab.dataset.mode)));
 openCameraButton.addEventListener("click", openCamera);
@@ -113,9 +122,6 @@ captureButton.addEventListener("click", captureCameraImage);
 dropzone.addEventListener("drop", (event) => {
   const [file] = event.dataTransfer.files;
   if (!file) return;
-  const transfer = new DataTransfer();
-  transfer.items.add(file);
-  imageInput.files = transfer.files;
   setSelectedFile(file);
 });
 
@@ -127,7 +133,7 @@ function showResult(data) {
   resultContent.hidden = false;
   preview.src = data.image_url;
   predictionText.textContent = recommendation.display_name || top.display_name;
-  modelUsed.textContent = `Analyzed with ${data.model_label}`;
+  modelUsed.textContent = "Analyzed with the automatically selected best model";
   confidenceBadge.className = `confidence-badge ${accepted ? "high" : "low"}`;
   confidenceBadge.textContent = accepted ? `${formatPercent(top.confidence)} confidence` : "Not accepted";
   statusText.className = `status ${accepted ? "good" : "warning"}`;
@@ -153,13 +159,15 @@ form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const useUrl = activeMode === "link";
   if (useUrl && !imageUrlInput.value.trim()) { setMessage("Paste a direct public image link before analyzing."); imageUrlInput.focus(); return; }
-  if (!useUrl && !imageInput.files[0]) { setMessage("Choose a JPG or PNG leaf image before analyzing."); imageInput.focus(); return; }
+  if (!useUrl && !selectedImageFile) { setMessage("Choose a JPG or PNG leaf image before analyzing."); imageInput.focus(); return; }
   button.disabled = true;
   button.querySelector("span").textContent = "Analyzing...";
   setMessage("");
   try {
     const endpoint = useUrl ? "/api/predict-url" : "/api/predict";
-    const response = await fetch(endpoint, { method: "POST", body: new FormData(form) });
+    const formData = new FormData(form);
+    if (!useUrl) formData.set("image", selectedImageFile);
+    const response = await fetch(endpoint, { method: "POST", body: formData });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Prediction failed. Please try again.");
     showResult(data);

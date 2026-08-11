@@ -17,6 +17,7 @@ MODEL_DIR = PROJECT_ROOT / "models"
 CLASS_NAMES_PATH = MODEL_DIR / "class_names.txt"
 IMAGE_SIZE = (224, 224)
 DEFAULT_MODEL_NAME = "mobilenetv2"
+MODEL_SELECTION_PRIORITY = ("mobilenetv2", "efficientnetb0")
 MODEL_FILENAMES = {
     "mobilenetv2": "crop_disease_mobilenetv2.keras",
     "efficientnetb0": "crop_disease_efficientnetb0.keras",
@@ -43,6 +44,14 @@ def get_available_models() -> list[dict]:
         }
         for name in MODEL_FILENAMES
     ]
+
+
+def get_best_available_model_name() -> str:
+    """Select the strongest available model for the app prediction workflow."""
+    for model_name in MODEL_SELECTION_PRIORITY:
+        if get_model_path(model_name).exists():
+            return model_name
+    raise FileNotFoundError("No trained prediction model is available in the models folder.")
 
 
 @lru_cache(maxsize=2)

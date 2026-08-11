@@ -8,7 +8,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 class Config:
     PROJECT_ROOT = PROJECT_ROOT
-    ASSET_VERSION = "2026.08.07.2"
+    ASSET_VERSION = "2026.08.11.1"
     SECRET_KEY = "development-only-change-this-before-deployment"
     MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10 MB
     UPLOAD_DIR = PROJECT_ROOT / "static" / "uploads"
